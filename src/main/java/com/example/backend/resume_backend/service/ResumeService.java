@@ -1,8 +1,10 @@
 package com.example.backend.resume_backend.service;
 
+import java.io.IOException;
+import java.util.Map;
+
 public interface ResumeService {
 
-    String generateResumeResponse(String userResumedescription);
-
+    Map<String, Object> generateResumeResponse(String userResumeDescription) throws IOException;
 
 }
