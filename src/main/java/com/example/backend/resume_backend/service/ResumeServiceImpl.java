@@ -1,9 +1,7 @@
 package com.example.backend.resume_backend.service;
 
-<<<<<<< HEAD
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-=======
->>>>>>> 6341af380aaef8f5b3f14b4299973b34a9064806
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.core.io.ClassPathResource;
@@ -12,18 +10,11 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-<<<<<<< HEAD
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class ResumeServiceImpl implements ResumeService {
-=======
-import java.util.Map;
-
-@Service
-public class ResumeServiceImpl implements ResumeService{
->>>>>>> 6341af380aaef8f5b3f14b4299973b34a9064806
 
     private ChatClient chatClient;
 
@@ -32,7 +23,6 @@ public class ResumeServiceImpl implements ResumeService{
     }
 
     @Override
-<<<<<<< HEAD
     public   Map<String, Object> generateResumeResponse(String userResumeDescription) throws IOException {
 
         String promptString = this.loadPromptFromFile("resume_prompt.txt");
@@ -46,20 +36,6 @@ public class ResumeServiceImpl implements ResumeService{
         return stringObjectMap;
     }
 
-=======
-    public String generateResumeResponse(String userResumeDescription) throws IOException {
-
-        String promptString = this.loadPromptFromFile("resume_prompt.txt");
-        String promptContent = this.putValuesToTemplate(promptString, Map.of("userDescription", userResumeDescription));
-
-        Prompt prompt=new Prompt(promptContent);
-
-        String response = chatClient.prompt(prompt).call().content();
-
-        //modify
-        return response;
-    }
->>>>>>> 6341af380aaef8f5b3f14b4299973b34a9064806
 
     String loadPromptFromFile(String filename) throws IOException {
         Path path = new ClassPathResource(filename).getFile().toPath();
@@ -68,18 +44,13 @@ public class ResumeServiceImpl implements ResumeService{
 
     String putValuesToTemplate(String template, Map<String, String> values) {
         for (Map.Entry<String, String> entry : values.entrySet()) {
-<<<<<<< HEAD
 
             template = template.replace("{{" + entry.getKey() + "}}", entry.getValue());
 
-=======
-            template = template.replace("{{" + entry.getKey() + "}}", entry.getValue());
->>>>>>> 6341af380aaef8f5b3f14b4299973b34a9064806
         }
         return template;
     }
 
-<<<<<<< HEAD
 
     public static Map<String, Object> parseMultipleResponses(String response) {
         Map<String, Object> jsonResponse = new HashMap<>();
@@ -114,6 +85,4 @@ public class ResumeServiceImpl implements ResumeService{
 
         return jsonResponse;
     }
-=======
->>>>>>> 6341af380aaef8f5b3f14b4299973b34a9064806
 }
