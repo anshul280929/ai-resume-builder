@@ -1,10 +1,12 @@
 import React from 'react'
 import { Outlet } from 'react-router'
+import Navbar from '../components/navbar.jsx'
 
 function Root() {
   return (
     <div>
-      <h1>Welcome to the AI Resume Builder</h1>
+      {/* navbar */}
+      <Navbar />
       <Outlet />
     </div>
   )
