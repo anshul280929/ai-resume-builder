@@ -11,6 +11,7 @@ import Resume from './pages/Resume.jsx'
 import Contact from './pages/Contact.jsx'
 
 import { BrowserRouter, Route, Routes } from 'react-router'
+import GenerateResume from './pages/GenerateResume.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -22,6 +23,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/services" element={<Service />} />
           <Route path="/resume" element={<Resume />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/generate-resume" element={<GenerateResume />} />
         </Route>
       </Routes>
     </BrowserRouter>
