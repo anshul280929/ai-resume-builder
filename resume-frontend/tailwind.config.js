@@ -15,6 +15,7 @@ export default {
       "forest",
       "black",
       "night",
+      "cupcake",
     ],
   },
 };

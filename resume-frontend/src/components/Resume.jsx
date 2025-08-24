@@ -1,4 +1,5 @@
 import React from "react";
+import "daisyui/dist/full.css";
 import { FaGithub, FaLinkedin, FaPhone, FaEnvelope } from "react-icons/fa";
 import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
@@ -62,9 +63,9 @@ const Resume = ({ data }) => {
                 <FaGithub className="mr-2" /> GitHub
               </a>
             )}
-            {data.personalInformation.linkedin && (
+            {data.personalInformation.linkedIn && (
               <a
-                href={data.personalInformation.linkedin}
+                href={data.personalInformation.linkedIn}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-500 hover:text-blue-700 flex items-center"
@@ -179,9 +180,7 @@ const Resume = ({ data }) => {
                 {proj.description}
               </p>
               <p className="text-gray-500">
-                🛠 Technologies: {Array.isArray(proj.technologiesUsed)
-                ? proj.technologiesUsed.join(", ")
-                : proj.technologiesUsed}
+                🛠 Technologies: {proj.technologiesUsed.join(", ")}
               </p>
               {proj.githubLink && (
                 <a
