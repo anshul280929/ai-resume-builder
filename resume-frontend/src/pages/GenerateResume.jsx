@@ -1,111 +1,79 @@
 import React, { useEffect, useState } from "react";
-import {
-  FaBrain,
-  FaTrash,
-  FaPaperPlane,
-  FaBook,
-  FaPlusCircle,
-} from "react-icons/fa";
-import { useForm, useFieldArray } from "react-hook-form";
-import { generateResume } from "../api/resumeService";
 import toast from "react-hot-toast";
-
-// ✅ ArrayInput moved OUTSIDE the main component
-const ArrayInput = ({ control, register, name, label }) => {
-  const { fields, append, remove } = useFieldArray({ control, name });
-
-  return (
-    <div className="form-control w-full max-w-lg mb-4">
-      <label className="label">
-        <span className="label-text text-base-content">{label}</span>
-      </label>
-      {fields.map((field, index) => (
-        <div key={field.id} className="flex items-center gap-2 mb-2">
-          <input
-            {...register(`${name}.${index}`)}
-            className="input input-bordered w-full bg-base-100 text-base-content"
-            placeholder={`Enter ${label}...`}
-          />
-          <button
-            type="button"
-            onClick={() => remove(index)}
-            className="btn btn-error btn-sm"
-          >
-            <FaTrash className="w-5 h-5 text-base-content" />
-          </button>
-        </div>
-      ))}
-      <button
-        type="button"
-        onClick={() => append("")}
-        className="btn btn-secondary btn-sm mt-2 flex items-center"
-      >
-        <FaPlusCircle className="w-5 h-5 mr-1 text-base-content" /> Add {label}
-      </button>
-    </div>
-  );
-};
+import { FaBrain, FaTrash, FaPaperPlane } from "react-icons/fa";
+import { generateResume } from "../api/ResumeService";
+import { BiBook } from "react-icons/bi";
+import { useForm, useFieldArray } from "react-hook-form";
+import { FaPlusCircle } from "react-icons/fa";
+import Resume from "../components/Resume";
 
 const GenerateResume = () => {
-  // Personal information state
   const [data, setData] = useState({
     personalInformation: {
       fullName: "Anshul Bhaskar",
-      email: "anshul@email.com",
-      phoneNumber: "+91 6201388825",
-      location: "Bengaluru, India",
-      linkedin: "https://www.linkedin.com/in/anshul/",
-      gitHub: "https://github.com/anshul",
-      portfolio: "https://anshul.portfolio",
     },
-    summary: "Experienced Java Developer...",
-    skills: {
-      programmingLanguages: ["Java", "JavaScript", "Python"],
-      frameworks: ["Spring Boot", "React.js"],
-      databases: ["MySQL", "PostgreSQL", "MongoDB"],
-      cloud: ["AWS"],
-      devOpsTools: ["Docker", "Kubernetes", "Ansible"],
-      otherSkills: ["RESTful APIs", "Microservices"],
-    },
-    experience: [
-      {
-        jobTitle: "Senior Software Developer",
-        company: "XYZ Solutions",
-        location: "New York, USA",
-        duration: "Jan 2017 - Present",
-      },
-    ],
+    summary: "",
+    skills: [],
+    experience: [],
+    education: [],
+    certifications: [],
+    projects: [],
+    languages: [],
+    interests: [],
   });
 
-  const { register, handleSubmit, control } = useForm({
+  const { register, handleSubmit, control, setValue, reset } = useForm({
     defaultValues: data,
   });
 
-  const onSubmit = (formData) => {
-    console.log("Form Data:", formData);
+  const [showFormUI, setShowFormUI] = useState(false);
+  const [showResumeUI, setShowResumeUI] = useState(false);
+  const [showPromptInput, setShowPromptInput] = useState(true);
+
+  const experienceFields = useFieldArray({ control, name: "experience" });
+  const educationFields = useFieldArray({ control, name: "education" });
+  const certificationsFields = useFieldArray({
+    control,
+    name: "certifications",
+  });
+  const projectsFields = useFieldArray({ control, name: "projects" });
+  const languagesFields = useFieldArray({ control, name: "languages" });
+  const interestsFields = useFieldArray({ control, name: "interests" });
+  const skillsFields = useFieldArray({ control, name: "skills" });
+
+  //handle form submit
+  const onSubmit = (data) => {
+    console.log("Form Data:", data);
+    setData({ ...data });
+
+    setShowFormUI(false);
+    setShowPromptInput(false);
+    setShowResumeUI(true);
   };
 
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    console.log("Personal Information Data:", data);
-  }, [data]);
-
   const handleGenerate = async () => {
-    alert("Generating your resume...");
+    console.log(description);
+    // server call to get resume
+
     try {
       setLoading(true);
       const responseData = await generateResume(description);
-      console.log("Resume Data:", responseData);
-      setData(responseData);
-      toast.success("Resume generated successfully!", {
+      console.log(responseData);
+      reset(responseData.data);
+
+      toast.success("Resume Generated Successfully!", {
         duration: 3000,
         position: "top-center",
       });
+      setShowFormUI(true);
+      setShowPromptInput(false);
+      setShowResumeUI(false);
     } catch (error) {
-      console.error("Error generating resume:", error);
-      toast.error("Failed to generate resume. Please try again.");
+      console.log(error);
+      toast.error("Error Generating Resume!");
     } finally {
       setLoading(false);
       setDescription("");
@@ -128,63 +96,117 @@ const GenerateResume = () => {
       />
     </div>
   );
-
-  function showForm() {
+  const renderFieldArray = (fields, label, name, keys) => {
     return (
-      <div>
+      <div className="form-control w-full mb-4">
+        <h3 className="text-xl font-semibold">{label}</h3>
+        {fields.fields.map((field, index) => (
+          <div key={field.id} className="p-4 rounded-lg mb-4 bg-base-100">
+            {keys.map((key) => (
+              <div key={key}>
+                {console.log(`${name}`)}
+                {renderInput(`${name}.${index}.${key}`, key)}
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => fields.remove(index)}
+              className="btn btn-error btn-sm mt-2"
+            >
+              <FaTrash className="w-5 h-5 text-base-content" /> Remove {label}
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() =>
+            fields.append(
+              keys.reduce((acc, key) => ({ ...acc, [key]: "" }), {})
+            )
+          }
+          className="btn btn-secondary btn-sm mt-2 flex items-center"
+        >
+          <FaPlusCircle className="w-5 h-5 mr-1 text-base-content" /> Add{" "}
+          {label}
+        </button>
+      </div>
+    );
+  };
+
+  function showFormFunction() {
+    return (
+      <div className="w-full p-10">
         <h1 className="text-4xl font-bold mb-6 flex items-center justify-center gap-2">
-          <FaBook className="text-accent" /> Resume Form
+          <BiBook className="text-accent" /> Resume Form
         </h1>
         <div>
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="p-6 space-y-6 bg-base-200 rounded-lg text-base-content"
           >
-            {/* Personal Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {renderInput("personalInformation.fullName", "Full Name")}
               {renderInput("personalInformation.email", "Email", "email")}
-              {renderInput("personalInformation.phoneNumber", "Phone Number", "tel")}
+              {renderInput(
+                "personalInformation.phoneNumber",
+                "Phone Number",
+                "tel"
+              )}
               {renderInput("personalInformation.location", "Location")}
               {renderInput("personalInformation.linkedin", "LinkedIn", "url")}
               {renderInput("personalInformation.gitHub", "GitHub", "url")}
               {renderInput("personalInformation.portfolio", "Portfolio", "url")}
             </div>
 
-            {/* Summary */}
-            <div className="form-control w-full">
-              <h3 className="text-xl font-semibold">Summary</h3>
-              <textarea
-                {...register("summary")}
-                className="textarea textarea-bordered w-full bg-base-100 text-base-content"
-                rows={4}
-              ></textarea>
-            </div>
+            <h3 className="text-xl font-semibold">Summary</h3>
+            <textarea
+              {...register("summary")}
+              className="textarea textarea-bordered w-full bg-base-100 text-base-content"
+              rows={4}
+            ></textarea>
 
-            {/* Skills */}
-            <h3 className="text-xl font-semibold mt-6">Skills</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <ArrayInput control={control} register={register} name="skills.programmingLanguages" label="Programming Languages" />
-              <ArrayInput control={control} register={register} name="skills.frameworks" label="Framework" />
-              <ArrayInput control={control} register={register} name="skills.databases" label="Databases" />
-              <ArrayInput control={control} register={register} name="skills.cloud" label="Cloud" />
-              <ArrayInput control={control} register={register} name="skills.devOpsTools" label="DevOps Tool" />
-              <ArrayInput control={control} register={register} name="skills.otherSkills" label="Other Skill" />
-            </div>
+            {renderFieldArray(skillsFields, "Skills", "skills", [
+              "title",
+              "level",
+            ])}
+            {renderFieldArray(experienceFields, "Experience", "experience", [
+              "jobTitle",
+              "company",
+              "location",
+              "duration",
+              "responsibility",
+            ])}
+            {renderFieldArray(educationFields, "Education", "education", [
+              "degree",
+              "university",
+              "location",
+              "graduationYear",
+            ])}
+            {renderFieldArray(
+              certificationsFields,
+              "Certifications",
+              "certifications",
+              ["title", "issuingOrganization", "year"]
+            )}
+            {renderFieldArray(projectsFields, "Projects", "projects", [
+              "title",
+              "description",
+              "technologiesUsed",
+              "githubLink",
+            ])}
 
-            {/* Experience */}
-            <h3 className="text-xl font-semibold mt-6">Experience</h3>
-            {data.experience.map((_, index) => (
-              <div
-                key={index}
-                className="border p-4 rounded-lg mb-4 bg-base-100 text-base-content"
-              >
-                {renderInput(`experience.${index}.jobTitle`, "Job Title")}
-                {renderInput(`experience.${index}.company`, "Company")}
-                {renderInput(`experience.${index}.location`, "Location")}
-                {renderInput(`experience.${index}.duration`, "Duration")}
+            <div className="flex gap-3 mt-16  p-4 rounded-xl ">
+              <div className="flex-1">
+                {renderFieldArray(languagesFields, "Languages", "languages", [
+                  "name",
+                ])}
               </div>
-            ))}
+              <div className="flex-1">
+                {renderFieldArray(interestsFields, "Interests", "interests", [
+                  "name",
+                ])}
+              </div>
+            </div>
 
             <button type="submit" className="btn btn-primary w-full">
               Submit
@@ -195,14 +217,15 @@ const GenerateResume = () => {
     );
   }
 
-  function showInputField() {
+  function ShowInputField() {
     return (
       <div className="bg-base-200 shadow-lg rounded-lg p-10 max-w-2xl w-full text-center">
         <h1 className="text-4xl font-bold mb-6 flex items-center justify-center gap-2">
           <FaBrain className="text-accent" /> AI Resume Description Input
         </h1>
         <p className="mb-4 text-lg text-gray-600">
-          Enter a detailed description about yourself to generate your professional resume.
+          Enter a detailed description about yourself to generate your
+          professional resume.
         </p>
         <textarea
           disabled={loading}
@@ -210,7 +233,7 @@ const GenerateResume = () => {
           placeholder="Type your description here..."
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-        />
+        ></textarea>
         <div className="flex justify-center gap-4">
           <button
             disabled={loading}
@@ -218,10 +241,10 @@ const GenerateResume = () => {
             className="btn btn-primary flex items-center gap-2"
           >
             {loading && <span className="loading loading-spinner"></span>}
-            <FaPaperPlane /> Generate Resume
+            <FaPaperPlane />
+            Generate Resume
           </button>
           <button
-            disabled={loading}
             onClick={handleClear}
             className="btn btn-secondary flex items-center gap-2"
           >
@@ -231,11 +254,42 @@ const GenerateResume = () => {
       </div>
     );
   }
+  function showResume() {
+    return (
+      <div>
+        <Resume data={data} />
+
+        <div className="flex mt-5 justify-center gap-2">
+          <div
+            onClick={() => {
+              setShowPromptInput(true);
+              setShowFormUI(false);
+              setShowResumeUI(false);
+            }}
+            className="btn btn-accent"
+          >
+            Generate Another
+          </div>
+          <div
+            onClick={() => {
+              setShowPromptInput(false);
+              setShowFormUI(true);
+              setShowResumeUI(false);
+            }}
+            className="btn btn-success"
+          >
+            Edit
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="mt-5 p-10 flex gap-3 flex-col items-center justify-center font-sans">
-      {data && showForm()}
-      {showInputField()}
+    <div className="mt-5 p-10 flex flex-col gap-3 items-center justify-center font-sans">
+      {showFormUI && showFormFunction()}
+      {showPromptInput && ShowInputField()}
+      {showResumeUI && showResume()}
     </div>
   );
 };
