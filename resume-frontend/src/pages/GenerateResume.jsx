@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FaBrain, FaTrash, FaPaperPlane } from "react-icons/fa";
-import { generateResume } from "../api/ResumeService";
+import { generateResume } from "../api/resumeService";
 import { BiBook } from "react-icons/bi";
 import { useForm, useFieldArray } from "react-hook-form";
 import { FaPlusCircle } from "react-icons/fa";
